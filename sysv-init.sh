@@ -31,22 +31,18 @@ SCRIPTNAME=/etc/init.d/$NAME
 
 case "$1" in
   start)
-	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
 	$DAEMON
 	;;
   stop)
-	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
 	$CONTROL shutdown
 	;;
   status)
 	$CONTROL status
 	;;
   restart|force-reload)
-	log_daemon_msg "Restarting $DESC" "$NAME"
 	$CONTROL reload
 	;;
   *)
-	#echo "Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload}" >&2
 	echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
 	exit 3
 	;;
