@@ -2,7 +2,7 @@
 HOME="/home"
 
 # necessary libaries
-apt-get install -y pkg-config bash-completion git build-essential libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev nginx
+apt-get install -y pkg-config bash-completion build-essential libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev nginx
 
 # fix library symlinks for python 2.6
 [ ! -f "/usr/lib/libssl.so" ] && ln -s /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/libssl.so
