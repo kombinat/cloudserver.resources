@@ -27,7 +27,8 @@ if [ ! -f "$HOME/$USER/.ssh/id_rsa.pub" ]; then
     su - $USER -c "ssh-keyscan gitlab.kombinat.at > .ssh/known_hosts"
     # global gitignore
     su - $USER -c "git config --global core.excludesfile '~/.gitignore'"
-    su - $USER -c "wget https://raw.githubusercontent.com/kombinat/cloudserver.resources/master/.gitignore"
+    cp .gitignore $HOME/$USER/
+    chown $USER $HOME/$USER/.gitignore
 fi
 
 py_versions=("2.6.9" "2.7.14")
@@ -78,7 +79,7 @@ nginx -t
 
 echo
 echo "Installing SysV init script"
-wget -O /etc/init.d/supervisor https://raw.githubusercontent.com/kombinat/cloudserver.resources/master/sysv-init.sh
+cp supervisor.sh /etc/init.d/supervisor
 sed -i -e "s/<user>/$USER/g" /etc/init.d/supervisor
 chmod +x /etc/init.d/supervisor
 update-rc.d supervisor defaults
