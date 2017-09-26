@@ -2,7 +2,7 @@
 HOME="/home"
 
 # necessary libaries
-apt-get install -y pkg-config bash-completion build-essential libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev nginx
+apt-get install -y nano pkg-config bash-completion build-essential libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev nginx
 
 # fix library symlinks for python 2.6
 [ ! -f "/usr/lib/libssl.so" ] && ln -s /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/libssl.so
@@ -22,7 +22,9 @@ fi
 if [ ! -f "$HOME/$USER/.ssh/id_rsa.pub" ]; then
     su - $USER -c "ssh-keygen -t rsa -b 4096"
     echo "Add this SSH key to gitlab deploy keys"
+    echo "-------------------------"
     cat $HOME/$USER/.ssh/id_rsa.pub
+    echo "-------------------------"
     # add gitlab.kombinat.at to known_hosts
     su - $USER -c "ssh-keyscan gitlab.kombinat.at > .ssh/known_hosts"
     # global gitignore
@@ -33,6 +35,7 @@ fi
 
 py_versions=("2.6.9" "2.7.14")
 PS3="Choose Python Version: "
+echo
 select py_version in "${py_versions[@]}"
 do
     py_prefix="$HOME/$USER/python-$py_version"
@@ -65,14 +68,15 @@ su - $USER -c "git clone $BUILDOUT_REPO zope_buildout"
 
 buildout_versions=("1.4.4" "2.9.4")
 PS3="Choose zc.buildout version: "
+echo
 select b_version in "${buildout_versions[@]}"
 do
-    setuptools_version=`[ "$b_version" = "1.4.4" ] && echo "0.6c11" || echo "33.1.1"`
+    [ "$b_version" = "1.4.4" ] && setuptools_version="0.6c11" || setuptools_version="33.1.1"
     su - $USER -c "cd zope_buildout && ../python-$py_version/bin/python bootstrap.py -v $b_version --setuptools-version=$setuptools_version && bin/buildout -N"
     break
 done
 
-su - $USER -c "mkdir -p log"
+[ ! -d "$HOME/$USER/log" ] && su - $USER -c "mkdir log"
 # copy nginx config to system nginx
 cp $HOME/$USER/zope_buildout/production/nginx.conf /etc/nginx/sites-enabled/$USER.conf
 nginx -t
