@@ -19,6 +19,9 @@ if [ ! -d "$HOME/$USER" ]; then
     useradd -m -s /bin/bash $USER
 fi
 
+# install logrotate
+[ ! -f "/etc/logrotate.d/$USER" ] && cp logrotate.conf /etc/logrotate.d/$USER
+
 if [ ! -f "$HOME/$USER/.ssh/id_rsa.pub" ]; then
     su - $USER -c "ssh-keygen -t rsa -b 4096"
     echo "Add this SSH key to gitlab deploy keys"
