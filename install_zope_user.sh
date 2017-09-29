@@ -9,6 +9,9 @@ apt-get install -y nano pkg-config bash-completion build-essential libjpeg8-dev 
 [ ! -f "/usr/lib/libjpeg.so" ] && ln -s /usr/lib/x86_64-linux-gnu/libjpeg.so /usr/lib/libjpeg.so
 [ ! -f "/usr/lib/libz.so" ] && ln -s /usr/lib/x86_64-linux-gnu/libz.so /usr/lib/libz.so
 
+# set timezone
+dpkg-reconfigure tzdata
+
 read -p "Enter username: " -r
 USER=$REPLY
 
