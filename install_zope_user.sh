@@ -2,7 +2,7 @@
 HOME="/home"
 
 # necessary libaries
-apt-get install -y nano pkg-config bash-completion awstats build-essential libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev libyaml-dev nginx
+apt-get install -y nano pkg-config bash-completion awstats build-essential libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev libyaml-dev nginx php-fpm
 
 # fix library symlinks for python 2.6
 [ ! -f "/usr/lib/libssl.so" ] && ln -s /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/libssl.so
@@ -24,6 +24,9 @@ fi
 
 # install logrotate
 [ ! -f "/etc/logrotate.d/$USER" ] && cp logrotate.conf /etc/logrotate.d/$USER
+
+# install cgi-bin.php for fastcgi (awstats support)
+cp cgi-bin.php /etc/nginx/
 
 if [ ! -f "$HOME/$USER/.ssh/id_rsa.pub" ]; then
     su - $USER -c "ssh-keygen -t rsa -b 4096"
