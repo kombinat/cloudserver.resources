@@ -14,7 +14,7 @@ if (is_executable($_SERVER["X_SCRIPT_FILENAME"])) {
     if (is_resource($process)) {
         fclose($pipes[0]);
         $head = fgets($pipes[1]);
-        while (strcmp($head, "\\n")) {
+        while (strcmp($head, "\n")) {
             header($head);
             $head = fgets($pipes[1]);
         }
