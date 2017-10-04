@@ -17,7 +17,7 @@ umount /media/cdrom
 
 $BACKUPTOOL control.schedule.list
 echo
-read -p "Do you want to install new schedule for /home? [y/N] " -n 1 -r
+read -p "Do you want to install new schedule for /home? [y/N] " -r
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     $BACKUPTOOL control.schedule.add -name home_directory -datasources FileSystem -days All -time 02:00
     $BACKUPTOOL control.schedule.list
