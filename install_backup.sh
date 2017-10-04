@@ -1,22 +1,19 @@
 #!/bin/bash
 BACKUPTOOL=/opt/1UND1EU/bin/ClientTool
 
-if [ ! -x $BACKUPTOOL ]; then
-    [ -d /media/cdrom ] || mkdir /media/cdrom
-    mount -t auto /dev/cdrom /media/cdrom
-    BACKUPMANAGER=`ls /media/cdrom/linux/*x86_64.run`
+[ -d /media/cdrom ] || mkdir /media/cdrom
+mount -t auto /dev/cdrom /media/cdrom
+BACKUPMANAGER=`ls /media/cdrom/linux/*x86_64.run`
 
-    if [ -z "$BACKUPMANAGER" ]; then
-        echo "Backupmanager not found!"
-        ls -l /media/cdrom/linux
-        exit 1
-    fi
-
-    echo "Starting $BACKUPMANAGER"
-    sh $BACKUPMANAGER
-
-    umount /media/cdrom
+if [ -z "$BACKUPMANAGER" ]; then
+    echo "Backupmanager not found!"
+    ls -l /media/cdrom/linux
+    exit 1
 fi
+
+echo "Starting $BACKUPMANAGER"
+sh $BACKUPMANAGER
+umount /media/cdrom
 
 $BACKUPTOOL control.schedule.list
 echo
