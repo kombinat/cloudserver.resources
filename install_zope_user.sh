@@ -9,7 +9,7 @@ apt-get install -y libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev
 read -p "Install MySQL? [y/N]" -r
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     apt-get install -y mysql-server
-    apt-get install -y libmariadbclient-dev
+    apt-get install -y libmysqlclient-dev
 fi
 
 # fix library symlinks for python 2.6
