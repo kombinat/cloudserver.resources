@@ -2,7 +2,9 @@
 HOME="/home"
 
 # necessary libaries
-apt-get install -y nano pkg-config bash-completion awstats build-essential libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev libyaml-dev nginx php-fpm
+apt-get install -y nano pkg-config bash-completion awstats build-essential
+apt-get install -y libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev libyaml-dev nginx
+[ -z "`apt-cache search php-fpm`" ] && apt-get install php5-fpm || apt-get install php-fpm
 
 # fix library symlinks for python 2.6
 [ ! -f "/usr/lib/libssl.so" ] && ln -s /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/libssl.so
