@@ -64,7 +64,10 @@ do
     su - $USER -c "tar -xzvf Python-$py_version.tgz"
     su - $USER -c "cd Python-$py_version && ./configure --prefix $py_prefix && make && make install"
     su - $USER -c "rm -rf Python-$py_version*"
-    # install virtualenv
+    # install pip and virtualenv
+    su - $USER -c "wget https://bootstrap.pypa.io/get-pip.py"
+    su - $USER -c "$py_prefix/bin/python get-pip.py"
+    su - $USER -c "rm get-pip.py"
     su - $USER -c "$py_prefix/bin/pip install virtualenv"
     break
 done
