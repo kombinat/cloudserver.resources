@@ -64,6 +64,8 @@ do
     su - $USER -c "tar -xzvf Python-$py_version.tgz"
     su - $USER -c "cd Python-$py_version && ./configure --prefix $py_prefix && make && make install"
     su - $USER -c "rm -rf Python-$py_version*"
+    # install virtualenv
+    su - $USER -c "$py_prefix/bin/pip install virtualenv"
     break
 done
 
@@ -79,11 +81,12 @@ su - $USER -c "echo 'prefer-final = false' >> $HOME/$USER/.buildout/default.cfg"
 su - $USER -c "echo 'unzip = true' >> $HOME/$USER/.buildout/default.cfg"
 su - $USER -c "echo 'eggs-directory = $HOME/$USER/.buildout/eggs' >> $HOME/$USER/.buildout/default.cfg"
 su - $USER -c "echo 'download-cache = $HOME/$USER/.buildout/dlcache' >> $HOME/$USER/.buildout/default.cfg"
+su - $USER -c "echo 'find-links = https://pypi.python.org' >> $HOME/$USER/.buildout/default.cfg"
 
 read -p "Enter Buildout Git repository: " -r
 BUILDOUT_REPO=$REPLY
 su - $USER -c "git clone $BUILDOUT_REPO zope_buildout"
-su - $USER -c "cd zope_buildout && ../python-$py_version/bin/pip install -r requirements.txt && bin/buildout -N"
+su - $USER -c "cd zope_buildout && ../python-$py_version/bin/virtualenv . && ./bin/pip install -r requirements.txt && ./bin/buildout -N"
 
 [ ! -d "$HOME/$USER/log" ] && su - $USER -c "mkdir log"
 # copy nginx config to system nginx
