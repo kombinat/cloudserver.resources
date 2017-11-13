@@ -2,8 +2,9 @@
 HOME="/home"
 
 # necessary libaries
-apt-get install -y nano pkg-config bash-completion awstats build-essential
-apt-get install -y libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev libyaml-dev nginx
+apt-get install -y nano pkg-config bash-completion nginx awstats build-essential
+# python dependencies
+apt-get install -y libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev libyaml-dev python-docutils
 [ -z "`apt-cache search php-fpm`" ] && apt-get install -y php5-fpm || apt-get install -y php-fpm
 
 read -p "Install MySQL? [y/N]" -r
@@ -82,16 +83,7 @@ su - $USER -c "echo 'download-cache = $HOME/$USER/.buildout/dlcache' >> $HOME/$U
 read -p "Enter Buildout Git repository: " -r
 BUILDOUT_REPO=$REPLY
 su - $USER -c "git clone $BUILDOUT_REPO zope_buildout"
-
-buildout_versions=("1.4.4" "2.9.4")
-PS3="Choose zc.buildout version: "
-echo
-select b_version in "${buildout_versions[@]}"
-do
-    [ "$b_version" = "1.4.4" ] && setuptools_version="0.6c11" || setuptools_version="33.1.1"
-    su - $USER -c "cd zope_buildout && ../python-$py_version/bin/python bootstrap.py -v $b_version --setuptools-version=$setuptools_version && bin/buildout -N"
-    break
-done
+su - $USER -c "cd zope_buildout && ../python-$py_version/bin/pip install -r requirements.txt && bin/buildout -N"
 
 [ ! -d "$HOME/$USER/log" ] && su - $USER -c "mkdir log"
 # copy nginx config to system nginx
