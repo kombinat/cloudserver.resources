@@ -12,6 +12,10 @@ certbot --nginx certonly
 
 echo "30 0 * * * certbot renew" | crontab -
 
+echo "Installed certbot renew cronjob:"
+crontab -l
+echo
+
 echo "Certificate installed."
 echo
 echo "You have to edit your nginx live-config manually or "
