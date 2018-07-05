@@ -10,7 +10,7 @@ apt-get install python-certbot-nginx
 
 certbot --nginx certonly
 
-echo "00 30 * * * certbot renew" | crontab -
+echo "30 0 * * * certbot renew" | crontab -
 
 echo "Certificate installed."
 echo
