@@ -3,12 +3,12 @@ apt-get install -y sshpass
 
 read -p "Sync Stats/Logs/ZODB for local Username: " -r
 USER=$REPLY
+read -p "Remote Server: " -r
+HOST=$REPLY
 read -p "Remote Server Login: " -r
 REMOTE_USER=$REPLY
 read -p "Remote Server Password: " -r
 REMOTE_PWD=$REPLY
-read -p "Remote Server: " -r
-HOST=$REPLY
 read -p "Remote Account (user in /home directory): " -r
 REMOTE_ACCOUNT=$REPLY
 read -p "Remote Subpath in User directory (eg. zope/buildout): " -r
