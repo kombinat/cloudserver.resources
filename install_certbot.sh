@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# THIS IS FOR UBUNTU ONLY!
+# THIS IS FOR UBUNTU + NGINX ONLY!
 
 apt-get update
 apt-get install software-properties-common
