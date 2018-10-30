@@ -19,7 +19,7 @@ fi
 [ ! -f "/usr/lib/libz.so" ] && ln -s /usr/lib/x86_64-linux-gnu/libz.so /usr/lib/libz.so
 
 # set timezone (selection list for berlin coordinates)
-tzselect -c +52.52+13.0
+dpkg-reconfigure tzdata
 
 read -p "Enter username: " -r
 USER=$REPLY
