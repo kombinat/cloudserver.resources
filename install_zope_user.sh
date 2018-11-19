@@ -13,6 +13,14 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     apt-get install -y libmysqlclient-dev
 fi
 
+read -p "Install Postfix? [y/N]" -r
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    apt-get -y install mailutils
+    echo
+    echo "You may want to configure postfix as readonly SMTP relay with"
+    echo " > inet_interfaces = localhost"
+    echo "in /etc/postfix/main.cf"
+
 # fix library symlinks for python 2.6
 [ ! -f "/usr/lib/libssl.so" ] && ln -s /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/libssl.so
 [ ! -f "/usr/lib/libjpeg.so" ] && ln -s /usr/lib/x86_64-linux-gnu/libjpeg.so /usr/lib/libjpeg.so
