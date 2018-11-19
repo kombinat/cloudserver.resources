@@ -20,6 +20,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "You may want to configure postfix as readonly SMTP relay with"
     echo " > inet_interfaces = localhost"
     echo "in /etc/postfix/main.cf"
+fi
 
 # fix library symlinks for python 2.6
 [ ! -f "/usr/lib/libssl.so" ] && ln -s /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/libssl.so
