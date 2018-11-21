@@ -40,6 +40,9 @@ USER=$REPLY
 if [ ! -d "$HOME/$USER" ]; then
     echo "Creating user $USER"
     useradd -m -s /bin/bash $USER
+    # prepare statistik output for awstats
+    mkdir $HOME/$USER/stats
+    chgrp www-data $HOME/$USER/stats
 fi
 
 # install logrotate
