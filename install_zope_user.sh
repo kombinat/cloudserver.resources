@@ -98,7 +98,7 @@ su - $USER -c "echo 'prefer-final = false' >> $HOME/$USER/.buildout/default.cfg"
 su - $USER -c "echo 'unzip = true' >> $HOME/$USER/.buildout/default.cfg"
 su - $USER -c "echo 'eggs-directory = $HOME/$USER/.buildout/eggs' >> $HOME/$USER/.buildout/default.cfg"
 su - $USER -c "echo 'download-cache = $HOME/$USER/.buildout/dlcache' >> $HOME/$USER/.buildout/default.cfg"
-su - $USER -c "echo 'find-links = https://pypi.python.org' >> $HOME/$USER/.buildout/default.cfg"
+su - $USER -c "echo 'index = https://pypi.org/simple/' >> $HOME/$USER/.buildout/default.cfg"
 
 read -p "Enter Buildout Git repository: " -r
 BUILDOUT_REPO=$REPLY
