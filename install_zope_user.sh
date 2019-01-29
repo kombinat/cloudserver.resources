@@ -2,7 +2,7 @@
 HOME="/home"
 
 # necessary libaries
-apt-get install -y nano pkg-config bash-completion nginx awstats build-essential ntpdate
+apt-get install -y nano pkg-config bash-completion nginx awstats build-essential ntpdate net-tools
 # python dependencies
 apt-get install -y libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev libyaml-dev python-docutils
 [ -z "`apt-cache search php-fpm`" ] && apt-get install -y php5-fpm || apt-get install -y php-fpm
