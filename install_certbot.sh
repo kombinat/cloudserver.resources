@@ -8,7 +8,7 @@ add-apt-repository ppa:certbot/certbot
 apt-get update
 apt-get install python-certbot-nginx
 
-certbot --nginx certonly
+certbot certonly --manual --preferred-challenges=dns
 
 echo "Certificate installed."
 echo
