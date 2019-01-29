@@ -110,11 +110,6 @@ su - $USER -c "cd zope_buildout && ../python-$py_version/bin/virtualenv . && ./b
 cp $HOME/$USER/zope_buildout/production/nginx.conf /etc/nginx/sites-enabled/$USER.conf
 nginx -t
 
-echo
-echo "Installing SysV init script"
-cp supervisor.sh /etc/init.d/supervisor
-sed -i -e "s/<user>/$USER/g" /etc/init.d/supervisor
-chmod +x /etc/init.d/supervisor
-update-rc.d supervisor defaults
+. install_sysv_init.sh
 
 exit 0
