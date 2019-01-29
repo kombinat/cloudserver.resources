@@ -18,7 +18,7 @@ if [ -z "`cat /home/$USER/.ssh/known_hosts | grep $HOST`" ]; then
     su - $USER -c "ssh-keyscan $HOST >> .ssh/known_hosts"
 fi
 
-su - $USER -c "mkdir -p stats && mkdir log"
+su - $USER -c "mkdir -p stats && mkdir -p log"
 su - $USER -c "rsync -Prv --rsh 'sshpass -p $REMOTE_PWD ssh -l $REMOTE_USER' $REMOTE_USER@$HOST:/home/$REMOTE_ACCOUNT/$SUBPATH/var/filestorage/Data.fs ./zope_buildout/var/filestorage/"
 su - $USER -c "rsync -Prv --rsh 'sshpass -p $REMOTE_PWD ssh -l $REMOTE_USER' $REMOTE_USER@$HOST:/home/$REMOTE_ACCOUNT/$SUBPATH/var/blobstorage ./zope_buildout/var/"
 su - $USER -c "rsync -Prv --rsh 'sshpass -p $REMOTE_PWD ssh -l $REMOTE_USER' $REMOTE_USER@$HOST:/home/$REMOTE_ACCOUNT/log/* ./log/"
