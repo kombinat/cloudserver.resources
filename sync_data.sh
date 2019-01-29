@@ -14,6 +14,10 @@ REMOTE_ACCOUNT=$REPLY
 read -p "Remote Subpath in User directory (eg. zope/buildout): " -r
 SUBPATH=$REPLY
 
+if [ -z "`cat ~/.ssh/known_hosts | grep $HOST`" ]; then
+    ssh-keyscan $HOST >> ~/.ssh/known_hosts
+fi
+
 if [ -z "`cat /home/$USER/.ssh/known_hosts | grep $HOST`" ]; then
     su - $USER -c "ssh-keyscan $HOST >> .ssh/known_hosts"
 fi
@@ -22,4 +26,4 @@ su - $USER -c "mkdir -p stats && mkdir -p log"
 su - $USER -c "rsync -Prv --rsh 'sshpass -p $REMOTE_PWD ssh -l $REMOTE_USER' $REMOTE_USER@$HOST:/home/$REMOTE_ACCOUNT/$SUBPATH/var/filestorage/Data.fs ./zope_buildout/var/filestorage/"
 su - $USER -c "rsync -Prv --rsh 'sshpass -p $REMOTE_PWD ssh -l $REMOTE_USER' $REMOTE_USER@$HOST:/home/$REMOTE_ACCOUNT/$SUBPATH/var/blobstorage ./zope_buildout/var/"
 su - $USER -c "rsync -Prv --rsh 'sshpass -p $REMOTE_PWD ssh -l $REMOTE_USER' $REMOTE_USER@$HOST:/home/$REMOTE_ACCOUNT/log/* ./log/"
-rsync -Prv --rsh 'sshpass -p $REMOTE_PWD ssh -l $REMOTE_USER' $REMOTE_USER@$HOST:/home/$REMOTE_ACCOUNT/stats/* ./stats/
+rsync -Prv --rsh 'sshpass -p $REMOTE_PWD ssh -l $REMOTE_USER' $REMOTE_USER@$HOST:/home/$REMOTE_ACCOUNT/stats/* /home/$USER/stats/
