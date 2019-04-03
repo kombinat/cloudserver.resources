@@ -3,10 +3,10 @@
 # THIS IS FOR UBUNTU + NGINX ONLY!
 
 apt-get update
-apt-get install software-properties-common
+apt-get install -y software-properties-common
 add-apt-repository ppa:certbot/certbot
 apt-get update
-apt-get install python-certbot-nginx
+apt-get install -y python-certbot-nginx
 
 certbot certonly --nginx
 

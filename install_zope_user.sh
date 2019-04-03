@@ -45,6 +45,16 @@ if [ ! -d "$HOME/$USER" ]; then
     chgrp www-data $HOME/$USER/stats
 fi
 
+read -p "Set Hostname of Server to '$USER'? [y/N]" -r
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    hostname $USER
+    echo "$USER" > /etc/hostname
+    echo "127.0.0.1 $USER" >> /etc/hosts
+    echo "Done"
+else
+    echo "Skipped"
+fi
+
 # install logrotate
 [ ! -f "/etc/logrotate.d/$USER" ] && cp logrotate.conf /etc/logrotate.d/$USER
 
