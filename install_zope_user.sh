@@ -120,6 +120,6 @@ su - $USER -c "cd zope_buildout && ../python-$py_version/bin/virtualenv . && ./b
 cp $HOME/$USER/zope_buildout/production/nginx.conf /etc/nginx/sites-enabled/$USER.conf
 nginx -t
 
-. install_sysv_init.sh
+. install_sysv_init.sh $USER
 
 exit 0
