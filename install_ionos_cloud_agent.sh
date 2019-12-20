@@ -11,10 +11,10 @@ acronis_file="Backup_Agent_for_Linux_x86_64.bin"
 
 if which zypper >/dev/null 2>&1; then
     zypper refresh -fdb >/dev/null
-    zypper -n in kernel-default kernel-source gcc make perl rpm >/dev/null
+    zypper -n in kernel-default kernel-source gcc make perl rpm
 elif which apt-get >/dev/null 2>&1; then
     apt-get update >/dev/null
-    apt-get -y install linux-image-$(uname -r) linux-headers-$(uname -r) curl gcc make perl rpm >/dev/null
+    apt-get -y install linux-image-$(uname -r) linux-headers-$(uname -r) curl gcc make perl rpm
 fi
 
 curl -s ${acronis_repo}/${acronis_file} -o /tmp/${acronis_file}
