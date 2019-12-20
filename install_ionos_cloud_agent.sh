@@ -14,7 +14,7 @@ if which zypper >/dev/null 2>&1; then
     zypper -n in kernel-default kernel-source gcc make perl rpm >/dev/null
 elif which apt-get >/dev/null 2>&1; then
     apt-get update >/dev/null
-    apt-get -y install linux-image-$(uname -r) linux-headers-$(uname -r) gcc make perl rpm >/dev/null
+    apt-get -y install linux-image-$(uname -r) linux-headers-$(uname -r) curl gcc make perl rpm >/dev/null
 fi
 
 curl -s ${acronis_repo}/${acronis_file} -o /tmp/${acronis_file}
