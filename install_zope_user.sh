@@ -75,7 +75,7 @@ if [ ! -f "$HOME/$USER/.ssh/id_rsa.pub" ]; then
     chown $USER $HOME/$USER/.gitignore
 fi
 
-py_versions=("2.6.9" "2.7.16")
+py_versions=("2.6.9" "2.7.17")
 PS3="Choose Python Version: "
 echo
 select py_version in "${py_versions[@]}"
