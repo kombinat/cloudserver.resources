@@ -3,8 +3,9 @@ HOME="/home"
 
 # necessary libaries
 apt-get install -y nano pkg-config bash-completion nginx awstats build-essential ntpdate net-tools rename lynx
+
 # python dependencies
-apt-get install -y libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev libyaml-dev libsqlite3-dev python-docutils poppler-utils
+apt-get install -y libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev libyaml-dev libsqlite3-dev python-docutils poppler-utils libffi-dev
 [ -z "`apt-cache search php-fpm`" ] && apt-get install -y php5-fpm || apt-get install -y php-fpm
 
 read -p "Install MySQL? [y/N]" -r
