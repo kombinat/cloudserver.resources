@@ -4,7 +4,7 @@ HOME="/home"
 # necessary libaries
 apt-get install -y nano pkg-config bash-completion nginx awstats build-essential ntpdate net-tools rename lynx
 # python dependencies
-apt-get install -y libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev libyaml-dev libsqlite3-dev python-docutils
+apt-get install -y libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev libyaml-dev libsqlite3-dev python-docutils poppler-utils
 [ -z "`apt-cache search php-fpm`" ] && apt-get install -y php5-fpm || apt-get install -y php-fpm
 
 read -p "Install MySQL? [y/N]" -r
@@ -75,51 +75,30 @@ if [ ! -f "$HOME/$USER/.ssh/id_rsa.pub" ]; then
     chown $USER $HOME/$USER/.gitignore
 fi
 
-py_versions=("2.6.9" "2.7.17")
-PS3="Choose Python Version: "
-echo
-select py_version in "${py_versions[@]}"
-do
-    py_prefix="$HOME/$USER/python-$py_version"
-    [ -x "$py_prefix" ] && break
+read -p "Install pyenv for user '$USER'? [y/N]" -r
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    su - $USER
+    # The following lines are taken from https://github.com/pyenv/pyenv and
+    # https://github.com/pyenv/pyenv-virtualenv
+    git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+    # the sed invocation inserts the lines at the start of the file
+    # after any initial comment lines
+    sed -Ei -e '/^([^#]|$)/ {a \
+    export PYENV_ROOT="$HOME/.pyenv"
+    a \
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    a \
+    ' -e ':a' -e '$!{n;ba};}' ~/.profile
+    echo 'eval "$(pyenv init --path)"' >>~/.profile
+    echo 'eval "$(pyenv init -)"' >> ~/.bashrc
 
-    # install python
-    su - $USER -c "wget https://www.python.org/ftp/python/$py_version/Python-$py_version.tgz"
-    su - $USER -c "tar -xzvf Python-$py_version.tgz"
-    su - $USER -c "cd Python-$py_version && ./configure --prefix $py_prefix && make && make install"
-    su - $USER -c "rm -rf Python-$py_version*"
-    # install pip and virtualenv
-    su - $USER -c "wget https://bootstrap.pypa.io/get-pip.py"
-    su - $USER -c "$py_prefix/bin/python get-pip.py"
-    su - $USER -c "rm get-pip.py"
-    su - $USER -c "$py_prefix/bin/pip install virtualenv"
-    break
-done
+    source ~/.profile
 
-if [ -x "$HOME/$USER/zope_buildout" ]; then
-    echo "Buildout already exists! Exiting ..."
-    exit
+    git clone https://github.com/pyenv/pyenv-virtualenv.git $(pyenv root)/plugins/pyenv-virtualenv
+
+    logout
+else
+    echo "Skipped"
 fi
-
-su - $USER -c "mkdir -p $HOME/$USER/.buildout/eggs"
-su - $USER -c "mkdir -p $HOME/$USER/.buildout/dlcache"
-su - $USER -c "echo '[buildout]' > $HOME/$USER/.buildout/default.cfg"
-su - $USER -c "echo 'prefer-final = false' >> $HOME/$USER/.buildout/default.cfg"
-su - $USER -c "echo 'unzip = true' >> $HOME/$USER/.buildout/default.cfg"
-su - $USER -c "echo 'eggs-directory = $HOME/$USER/.buildout/eggs' >> $HOME/$USER/.buildout/default.cfg"
-su - $USER -c "echo 'download-cache = $HOME/$USER/.buildout/dlcache' >> $HOME/$USER/.buildout/default.cfg"
-su - $USER -c "echo 'index = https://pypi.org/simple/' >> $HOME/$USER/.buildout/default.cfg"
-
-read -p "Enter Buildout Git repository: " -r
-BUILDOUT_REPO=$REPLY
-su - $USER -c "git clone $BUILDOUT_REPO zope_buildout"
-su - $USER -c "cd zope_buildout && ../python-$py_version/bin/virtualenv . && ./bin/pip install -r requirements.txt && ./bin/buildout -N"
-
-[ ! -d "$HOME/$USER/log" ] && su - $USER -c "mkdir log"
-# copy nginx config to system nginx
-cp $HOME/$USER/zope_buildout/production/nginx.conf /etc/nginx/sites-enabled/$USER.conf
-nginx -t
-
-. install_sysv_init.sh $USER
 
 exit 0
