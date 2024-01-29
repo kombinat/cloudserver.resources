@@ -9,7 +9,7 @@ apt-get install -y libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev
 apt-get install -y php-fpm
 
 # varnish
-apt get install -y python3-docutils
+apt-get install -y python3-docutils
 
 read -p "Install MySQL? [y/N]" -r
 if [[ $REPLY =~ ^[Yy]$ ]]; then
