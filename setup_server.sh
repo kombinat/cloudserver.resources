@@ -31,6 +31,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     dpkg-reconfigure tzdata
     # get actual time from ntp.org
     ntpdate de.pool.ntp.org
+fi
 
 read -p "Set hostname? [y/N]" -r
 if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -41,6 +42,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "$HOSTNAME" > /etc/hostname
     echo "127.0.0.1 $HOSTNAME" >> /etc/hosts
     echo "Set hostname to $HOSTNAME: done"
+fi
 
 read -p "Install logrotate? [y/N]" -r
 if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -48,6 +50,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo
     echo "Installing logrotage to /etc/logrotate/$HOSTNAME"
     [ ! -f "/etc/logrotate.d/$HOSTNAME" ] && cp logrotate.conf /etc/logrotate.d/$HOSTNAME
+fi
 
 read -p "Install php-fpm? [y/N]" -r
 if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -56,5 +59,6 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "Installing cgi-bin.php to /etc/nginx for php support"
     apt-get install -y php-fpm
     cp cgi-bin.php /etc/nginx/
+fi
 
 echo "Done setting up your server."
