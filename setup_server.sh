@@ -6,7 +6,6 @@ apt-get install -y nano pkg-config bash-completion nginx awstats build-essential
 
 # python dependencies
 apt-get install -y libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev libyaml-dev libsqlite3-dev poppler-utils libffi-dev
-apt-get install -y php-fpm
 
 # varnish
 apt-get install -y python3-docutils
@@ -26,25 +25,36 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "in /etc/postfix/main.cf"
 fi
 
-# set timezone (selection list for berlin coordinates)
-dpkg-reconfigure tzdata
-# get actual time from ntp.org
-ntpdate de.pool.ntp.org
+read -p "Set timezone? [y/N]" -r
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    # set timezone (selection list for berlin coordinates)
+    dpkg-reconfigure tzdata
+    # get actual time from ntp.org
+    ntpdate de.pool.ntp.org
 
-read -p "Enter hostname: " -r
-HOSTNAME=$REPLY
+read -p "Set hostname? [y/N]" -r
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    read -p "Enter hostname: " -r
+    HOSTNAME=$REPLY
 
-hostname $HOSTNAME
-echo "$HOSTNAME" > /etc/hostname
-echo "127.0.0.1 $HOSTNAME" >> /etc/hosts
-echo "Set hostname to $HOSTNAME: done"
+    hostname $HOSTNAME
+    echo "$HOSTNAME" > /etc/hostname
+    echo "127.0.0.1 $HOSTNAME" >> /etc/hosts
+    echo "Set hostname to $HOSTNAME: done"
 
-# install logrotate
-echo
-echo "Installing logrotage to /etc/logrotate/$HOSTNAME"
-[ ! -f "/etc/logrotate.d/$HOSTNAME" ] && cp logrotate.conf /etc/logrotate.d/$HOSTNAME
+read -p "Install logrotate? [y/N]" -r
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    # install logrotate
+    echo
+    echo "Installing logrotage to /etc/logrotate/$HOSTNAME"
+    [ ! -f "/etc/logrotate.d/$HOSTNAME" ] && cp logrotate.conf /etc/logrotate.d/$HOSTNAME
 
-# install cgi-bin.php for fastcgi (awstats support)
-echo
-echo "Installing cgi-bin.php to /etc/nginx for php support"
-cp cgi-bin.php /etc/nginx/
+read -p "Install php-fpm? [y/N]" -r
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    # install cgi-bin.php for fastcgi (awstats support)
+    echo
+    echo "Installing cgi-bin.php to /etc/nginx for php support"
+    apt-get install -y php-fpm
+    cp cgi-bin.php /etc/nginx/
+
+echo "Done setting up your server."
