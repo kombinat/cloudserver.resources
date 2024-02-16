@@ -2,7 +2,7 @@
 HOME="/home"
 
 # necessary libaries
-apt-get install -y nano pkg-config bash-completion nginx awstats build-essential ntpdate net-tools rename lynx libwww-perl
+apt-get install -y nano pkg-config bash-completion nginx awstats build-essential ntpdate net-tools rename lynx libwww-perl munin-node
 
 # python dependencies
 apt-get install -y libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev libyaml-dev libsqlite3-dev poppler-utils libffi-dev liblzma-dev libbz2-dev
