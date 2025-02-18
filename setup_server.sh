@@ -5,7 +5,7 @@ HOME="/home"
 apt-get install -y nano pkg-config bash-completion nginx awstats build-essential ntpdate net-tools rename lynx libwww-perl munin-node
 
 # python dependencies
-apt-get install -y libjpeg8-dev libssl-dev libpcre++-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev libyaml-dev libsqlite3-dev poppler-utils libffi-dev liblzma-dev libbz2-dev libcrypt-dev
+apt-get install -y libjpeg8-dev libssl-dev libpcre++-dev libpcre3-dev libpng-dev libxslt1-dev libxml2-dev zlib1g-dev libmemcached-dev libreadline-dev libncurses5-dev libyaml-dev libsqlite3-dev poppler-utils libffi-dev liblzma-dev libbz2-dev libcrypt-dev
 
 # varnish
 apt-get install -y python3-docutils
