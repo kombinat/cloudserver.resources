@@ -1,29 +1,22 @@
 #!/bin/bash
-BACKUPTOOL=/opt/1UND1EU/bin/ClientTool
 
-[ -d /media/cdrom ] || mkdir /media/cdrom
-mount -t auto /dev/cdrom /media/cdrom
-BACKUPMANAGER=`ls /media/cdrom/linux/*x86_64.run`
-
-if [ -z "$BACKUPMANAGER" ]; then
-    echo "Backupmanager not found!"
-    ls -l /media/cdrom/linux
-    exit 1
+if [ "$(date +%Y%m%d)" -ge "20251231" ]; then
+    echo "This installation script is out of date"
+    echo "Please, download a new script from your Cloud Panel"
+    exit
 fi
 
-echo "Starting $BACKUPMANAGER"
-sh $BACKUPMANAGER
-umount /media/cdrom
+acronis_repo="https://cloudpanel.ionos.com/download"
+acronis_file="Backup_Agent_for_Linux_x86_64.bin"
 
-$BACKUPTOOL control.schedule.list
-echo
-read -p "Do you want to install new schedule for /home? [y/N] " -r
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    $BACKUPTOOL control.schedule.add -name home_directory -datasources FileSystem -days All -time 02:00
-    $BACKUPTOOL control.schedule.list
+if which zypper >/dev/null 2>&1; then
+    zypper refresh -fdb >/dev/null
+    zypper -n in kernel-default kernel-source gcc make perl rpm >/dev/null
+elif which apt-get >/dev/null 2>&1; then
+    apt-get update >/dev/null
+    apt-get -y install linux-image-$(uname -r) linux-headers-$(uname -r) gcc make perl rpm >/dev/null
 fi
 
-echo
-$BACKUPTOOL control.selection.modify -datasource FileSystem -include /home
-$BACKUPTOOL control.selection.modify -datasource FileSystem -include /etc
-$BACKUPTOOL control.selection.list
+curl -s ${acronis_repo}/${acronis_file} -o /tmp/${acronis_file}
+bash /tmp/${acronis_file} --auto --token=592F-2AE4-4261
+rm /tmp/${acronis_file}
