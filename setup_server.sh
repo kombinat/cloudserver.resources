@@ -1,4 +1,11 @@
 #!/bin/bash
+
+# check if we are root
+if [ "$EUID" -ne 0 ]; then
+    echo "This script must be run as root. Please run 'sudo ./setup_server.sh'"
+    exit 1
+fi
+
 HOME="/home"
 
 # List of system-related dependencies
@@ -27,7 +34,7 @@ for pkg in "${SYSTEM_DEPENDENCIES[@]}"; do
         if dpkg -s "$pkg" > /dev/null 2>&1; then
             echo "✔️  $pkg is already installed – skipping."
         else
-            sudo apt-get install -y "$pkg"
+            apt-get install -y "$pkg"
         fi
     else
         echo "⚠️  Package '$pkg' is not available – skipping."
@@ -65,7 +72,7 @@ for pkg in "${PYTHON_DEPENDENCIES[@]}"; do
         if dpkg -s "$pkg" > /dev/null 2>&1; then
             echo "✔️  $pkg is already installed – skipping."
         else
-            sudo apt-get install -y "$pkg"
+            apt-get install -y "$pkg"
         fi
     else
         echo "⚠️  Package '$pkg' is not available – skipping."
