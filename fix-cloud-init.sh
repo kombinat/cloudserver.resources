@@ -1,8 +1,8 @@
 #!/bin/bash
 # ============================================================
 #  fix-cloud-init.sh
-#  Behebt den cloud-init Versionskonflikt auf Ubuntu 22.04
-#  (Downgrade von 25.3 auf 22.1 + Version einfrieren)
+#  Behebt den cloud-init Versionskonflikt auf Ubuntu 22.04/24.04
+#  (Downgrade auf Distro-native Version + einfrieren)
 # ============================================================
 
 set -e
@@ -13,35 +13,49 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-TARGET_VERSION="22.1-14-g2e17a0d6-0ubuntu1~22.04.5"
+# Zielversionen pro Ubuntu-Release
+declare -A TARGET_VERSIONS=(
+    ["22.04"]="22.1-14-g2e17a0d6-0ubuntu1~22.04.5"
+    ["24.04"]="24.1.3-0ubuntu3"
+)
 
 log()    { echo -e "${BLUE}[INFO]${NC}  $1"; }
 ok()     { echo -e "${GREEN}[OK]${NC}    $1"; }
 warn()   { echo -e "${YELLOW}[WARN]${NC}  $1"; }
 error()  { echo -e "${RED}[ERROR]${NC} $1"; exit 1; }
 
-echo ""
-echo "============================================================"
-echo "  cloud-init Fix – Ubuntu 22.04"
-echo "  Ziel-Version: $TARGET_VERSION"
-echo "============================================================"
-echo ""
-
 # Root-Check
 if [ "$EUID" -ne 0 ]; then
     error "Bitte als root ausführen: sudo bash fix-cloud-init.sh"
 fi
 
-# OS-Check
+# OS-Check und Zielversion bestimmen
 DISTRO=$(lsb_release -rs 2>/dev/null || echo "unknown")
-if [ "$DISTRO" != "22.04" ]; then
-    warn "Dieses Script ist für Ubuntu 22.04 – erkannte Version: $DISTRO"
-    read -p "Trotzdem fortfahren? (j/N): " confirm
+if [[ -n "${TARGET_VERSIONS[$DISTRO]+x}" ]]; then
+    TARGET_VERSION="${TARGET_VERSIONS[$DISTRO]}"
+else
+    warn "Keine vordefinierte Version für Ubuntu $DISTRO"
+    # Versuche die neueste Distro-Version aus dem Repo zu ermitteln
+    apt-get update -qq 2>/dev/null
+    TARGET_VERSION=$(apt-cache showpkg cloud-init 2>/dev/null \
+        | awk '/^Versions:/{found=1; next} found && /^[0-9]/{print $1; exit}')
+    if [ -z "$TARGET_VERSION" ]; then
+        error "Konnte keine cloud-init Version im Repo finden für Ubuntu $DISTRO"
+    fi
+    warn "Verwende Repo-Version: $TARGET_VERSION"
+    read -p "Fortfahren? (j/N): " confirm
     [[ "$confirm" =~ ^[jJyY]$ ]] || exit 0
 fi
 
+echo ""
+echo "============================================================"
+echo "  cloud-init Fix – Ubuntu $DISTRO"
+echo "  Ziel-Version: $TARGET_VERSION"
+echo "============================================================"
+echo ""
+
 # Schritt 1: Aktuelle Version anzeigen
-log "Schritt 1/6: Aktuelle cloud-init Version prüfen..."
+log "Schritt 1/7: Aktuelle cloud-init Version prüfen..."
 CURRENT=$(dpkg -l cloud-init 2>/dev/null | awk '/^[hi]i/{print $3}' || echo "nicht installiert")
 echo "  Installiert: $CURRENT"
 echo "  Ziel:        $TARGET_VERSION"
@@ -58,7 +72,7 @@ if [ "$CURRENT" = "$TARGET_VERSION" ]; then
 fi
 
 # Schritt 2: cloud-init entfernen
-log "Schritt 2/6: cloud-init vollständig entfernen..."
+log "Schritt 2/7: cloud-init vollständig entfernen..."
 # Hold aufheben, falls vom vorherigen Lauf vorhanden
 if apt-mark showhold 2>/dev/null | grep -q "^cloud-init$"; then
     apt-mark unhold cloud-init
@@ -68,7 +82,7 @@ apt-get remove --purge cloud-init -y -q
 ok "cloud-init entfernt"
 
 # Schritt 3: Python-Reste löschen
-log "Schritt 3/6: Python-Reste und Cache bereinigen..."
+log "Schritt 3/7: Python-Reste und Cache bereinigen..."
 rm -rf /usr/lib/python3/dist-packages/cloudinit
 rm -rf /usr/local/lib/python3*/dist-packages/cloudinit
 find /usr -name "*.pyc" -path "*cloudinit*" -delete 2>/dev/null || true
@@ -77,19 +91,41 @@ apt-get clean -q
 ok "Reste bereinigt"
 
 # Schritt 4: Paketlisten aktualisieren
-log "Schritt 4/6: Paketlisten aktualisieren..."
+log "Schritt 4/7: Paketlisten aktualisieren..."
 apt-get update -q
 ok "Paketlisten aktuell"
 
 # Schritt 5: Korrekte Version installieren
-log "Schritt 5/6: cloud-init $TARGET_VERSION installieren..."
+log "Schritt 5/7: cloud-init $TARGET_VERSION installieren..."
 if ! apt-get install -y cloud-init="$TARGET_VERSION" -q; then
     error "Installation fehlgeschlagen – Version $TARGET_VERSION nicht verfügbar"
 fi
 ok "cloud-init $TARGET_VERSION installiert"
 
-# Schritt 6: Version einfrieren
-log "Schritt 6/6: Version einfrieren (apt-mark hold)..."
+# Schritt 6: Datasource konfigurieren
+log "Schritt 6/7: Datasource-Konfiguration prüfen..."
+DS_CONFIG="/etc/cloud/cloud.cfg.d/90_dpkg.cfg"
+if [ ! -f "$DS_CONFIG" ] || ! grep -q "datasource_list" "$DS_CONFIG" 2>/dev/null; then
+    # Prüfe ob eine Datasource erkannt wird
+    if ! cloud-init query platform 2>/dev/null | grep -qv "unknown"; then
+        warn "Keine Datasource automatisch erkannt"
+        # Fallback: NoCloud als Datasource setzen (typisch für bare-metal/eigene Server)
+        cat > /etc/cloud/cloud.cfg.d/99_datasource.cfg <<'EOF'
+datasource_list: [ NoCloud, None ]
+datasource:
+  NoCloud:
+    fs_label: cidata
+EOF
+        ok "NoCloud-Datasource konfiguriert"
+    else
+        ok "Datasource wird automatisch erkannt"
+    fi
+else
+    ok "Datasource-Konfiguration vorhanden"
+fi
+
+# Schritt 7: Version einfrieren
+log "Schritt 7/7: Version einfrieren (apt-mark hold)..."
 apt-mark hold cloud-init
 ok "cloud-init wird nicht mehr automatisch aktualisiert"
 
