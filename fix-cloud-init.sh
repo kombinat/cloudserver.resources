@@ -55,7 +55,7 @@ echo "============================================================"
 echo ""
 
 # Schritt 1: Aktuelle Version anzeigen
-log "Schritt 1/7: Aktuelle cloud-init Version prüfen..."
+log "Schritt 1/8: Aktuelle cloud-init Version prüfen..."
 CURRENT=$(dpkg -l cloud-init 2>/dev/null | awk '/^[hi]i/{print $3}' || echo "nicht installiert")
 echo "  Installiert: $CURRENT"
 echo "  Ziel:        $TARGET_VERSION"
@@ -71,8 +71,27 @@ if [ "$CURRENT" = "$TARGET_VERSION" ]; then
     exit 0
 fi
 
-# Schritt 2: cloud-init entfernen
-log "Schritt 2/7: cloud-init vollständig entfernen..."
+# Schritt 2: cloud-init systemd-Units demaskieren und aktivieren
+log "Schritt 2/8: cloud-init systemd-Units prüfen..."
+CLOUD_UNITS="cloud-init-local.service cloud-init.service cloud-config.service cloud-final.service"
+for unit in $CLOUD_UNITS; do
+    if systemctl is-enabled "$unit" 2>/dev/null | grep -q "masked"; then
+        systemctl unmask "$unit"
+        log "$unit demaskiert"
+    fi
+done
+# cloud-init.disabled-Datei entfernen, falls vorhanden
+if [ -f /etc/cloud/cloud-init.disabled ]; then
+    rm -f /etc/cloud/cloud-init.disabled
+    log "/etc/cloud/cloud-init.disabled entfernt"
+fi
+for unit in $CLOUD_UNITS; do
+    systemctl enable "$unit" 2>/dev/null || true
+done
+ok "cloud-init systemd-Units aktiv"
+
+# Schritt 3: cloud-init entfernen
+log "Schritt 3/8: cloud-init vollständig entfernen..."
 # Hold aufheben, falls vom vorherigen Lauf vorhanden
 if apt-mark showhold 2>/dev/null | grep -q "^cloud-init$"; then
     apt-mark unhold cloud-init
@@ -81,8 +100,8 @@ fi
 apt-get remove --purge cloud-init -y -q
 ok "cloud-init entfernt"
 
-# Schritt 3: Python-Reste löschen
-log "Schritt 3/7: Python-Reste und Cache bereinigen..."
+# Schritt 4: Python-Reste löschen
+log "Schritt 4/8: Python-Reste und Cache bereinigen..."
 rm -rf /usr/lib/python3/dist-packages/cloudinit
 rm -rf /usr/local/lib/python3*/dist-packages/cloudinit
 find /usr -name "*.pyc" -path "*cloudinit*" -delete 2>/dev/null || true
@@ -90,20 +109,20 @@ apt-get autoremove -y -q
 apt-get clean -q
 ok "Reste bereinigt"
 
-# Schritt 4: Paketlisten aktualisieren
-log "Schritt 4/7: Paketlisten aktualisieren..."
+# Schritt 5: Paketlisten aktualisieren
+log "Schritt 5/8: Paketlisten aktualisieren..."
 apt-get update -q
 ok "Paketlisten aktuell"
 
-# Schritt 5: Korrekte Version installieren
-log "Schritt 5/7: cloud-init $TARGET_VERSION installieren..."
+# Schritt 6: Korrekte Version installieren
+log "Schritt 6/8: cloud-init $TARGET_VERSION installieren..."
 if ! apt-get install -y cloud-init="$TARGET_VERSION" -q; then
     error "Installation fehlgeschlagen – Version $TARGET_VERSION nicht verfügbar"
 fi
 ok "cloud-init $TARGET_VERSION installiert"
 
-# Schritt 6: Datasource konfigurieren
-log "Schritt 6/7: Datasource-Konfiguration prüfen..."
+# Schritt 7: Datasource konfigurieren
+log "Schritt 7/8: Datasource-Konfiguration prüfen..."
 DS_CONFIG="/etc/cloud/cloud.cfg.d/90_dpkg.cfg"
 if [ ! -f "$DS_CONFIG" ] || ! grep -q "datasource_list" "$DS_CONFIG" 2>/dev/null; then
     # Prüfe ob eine Datasource erkannt wird
@@ -133,8 +152,8 @@ else
     ok "Datasource-Konfiguration vorhanden"
 fi
 
-# Schritt 7: Version einfrieren
-log "Schritt 7/7: Version einfrieren (apt-mark hold)..."
+# Schritt 8: Version einfrieren
+log "Schritt 8/8: Version einfrieren (apt-mark hold)..."
 apt-mark hold cloud-init
 ok "cloud-init wird nicht mehr automatisch aktualisiert"
 
