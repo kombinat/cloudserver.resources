@@ -109,14 +109,23 @@ if [ ! -f "$DS_CONFIG" ] || ! grep -q "datasource_list" "$DS_CONFIG" 2>/dev/null
     # Prüfe ob eine Datasource erkannt wird
     if ! cloud-init query platform 2>/dev/null | grep -qv "unknown"; then
         warn "Keine Datasource automatisch erkannt"
-        # Fallback: NoCloud als Datasource setzen (typisch für bare-metal/eigene Server)
-        cat > /etc/cloud/cloud.cfg.d/99_datasource.cfg <<'EOF'
+        # ConfigDrive ist Standard bei IONOS; Fallback auf NoCloud für bare-metal
+        if blkid 2>/dev/null | grep -qi "config-2\|config_drive\|configdrive"; then
+            log "ConfigDrive-Volume erkannt – verwende ConfigDrive"
+            cat > /etc/cloud/cloud.cfg.d/99_datasource.cfg <<'EOF'
+datasource_list: [ ConfigDrive, None ]
+EOF
+            ok "ConfigDrive-Datasource konfiguriert"
+        else
+            warn "Kein ConfigDrive-Volume gefunden – verwende NoCloud als Fallback"
+            cat > /etc/cloud/cloud.cfg.d/99_datasource.cfg <<'EOF'
 datasource_list: [ NoCloud, None ]
 datasource:
   NoCloud:
     fs_label: cidata
 EOF
-        ok "NoCloud-Datasource konfiguriert"
+            ok "NoCloud-Datasource konfiguriert"
+        fi
     else
         ok "Datasource wird automatisch erkannt"
     fi
